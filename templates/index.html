@@ -738,7 +738,7 @@
 
         .location-inputs {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             margin-bottom: 0.5rem;
         }
 
@@ -748,7 +748,7 @@
             flex: 1;
         }
 
-        .location-coordinates .form-control {
+        .location-coordinates input {
             flex: 1;
         }
 
@@ -1102,6 +1102,127 @@
 
         .user-location-marker i {
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Custom Alert Styles */
+        .custom-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.7);
+            background: rgba(6, 10, 18, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem 2.5rem 2rem 2rem;
+            min-width: 380px;
+            max-width: 90%;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .custom-alert.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .custom-alert-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-left: -0.5rem;
+        }
+
+        .custom-alert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 229, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        .custom-alert[data-type="error"] .custom-alert-icon {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+
+        .custom-alert[data-type="warning"] .custom-alert-icon {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .custom-alert[data-type="success"] .custom-alert-icon {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+
+        .custom-alert-message {
+            color: var(--light);
+            font-size: 1rem;
+            line-height: 2;
+            flex: 1;
+            margin-top: 0.25rem;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+
+        .custom-alert-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.125rem;
+            transition: color 0.3s;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .custom-alert-close:hover {
+            color: var(--light);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .alert-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 480px) {
+            .custom-alert {
+                min-width: calc(100% - 32px);
+                margin: 0 16px;
+            }
         }
     </style>
 </head>
@@ -1527,6 +1648,23 @@
                     <input type="text" class="form-control" id="rent-product-name" readonly>
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Your Location</label>
+                    <div class="location-inputs">
+                        <div class="location-coordinates">
+                            <input type="text" class="form-control" id="rent-latitude" placeholder="Latitude" readonly>
+                            <input type="text" class="form-control" id="rent-longitude" placeholder="Longitude" readonly>
+                        </div>
+                        <button type="button" class="btn btn-outline" id="rent-location-btn">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Get Location
+                        </button>
+                        <button type="button" class="btn btn-outline" id="rent-copy-location">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="form-label" for="rent-duration">Rental Duration (hours)</label>
                     <input type="number" class="form-control" id="rent-duration" min="1" value="24">
                     <div class="form-text">Minimum rental period is 1 hour</div>
@@ -1539,10 +1677,24 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="justify-content: center; gap: 2rem;">
                 <button class="btn btn-outline" id="rent-modal-cancel">Cancel</button>
                 <button class="btn btn-primary" id="rent-modal-confirm">Confirm Rental</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert System -->
+    <div class="alert-overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlert">
+        <button class="custom-alert-close" id="alertClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="custom-alert-content">
+            <div class="custom-alert-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="custom-alert-message" id="alertMessage"></div>
         </div>
     </div>
 
@@ -1740,10 +1892,10 @@
                     await loadProducts();
                 } catch (error) {
                     console.error("Error connecting wallet", error);
-                    alert("Failed to connect wallet. Please try again.");
+                    showAlert("Failed to connect wallet. Please try again.", "error");
                 }
             } else {
-                alert("Please install MetaMask to use this application.");
+                showAlert("Please install MetaMask to use this application.", "warning");
             }
         }
 
@@ -1769,7 +1921,7 @@
                 contract = new web3.eth.Contract(contractABI, contractAddress);
             } catch (error) {
                 console.error("Error loading contract:", error);
-                alert("Failed to load contract. Please refresh the page.");
+                showAlert("Failed to load contract. Please refresh the page.", "error");
             }
         }
 
@@ -1898,7 +2050,68 @@
             currentProductPrice = productPrice;
             updateRentalTotal();
             rentModal.classList.add('active');
+            
+            // Clear location inputs
+            document.getElementById('rent-latitude').value = '';
+            document.getElementById('rent-longitude').value = '';
         }
+
+        // Get location for rental
+        document.getElementById('rent-location-btn').addEventListener('click', function() {
+            const button = this;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Location...';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        document.getElementById('rent-latitude').value = lat.toFixed(6);
+                        document.getElementById('rent-longitude').value = lng.toFixed(6);
+                        
+                        button.innerHTML = originalText;
+                        showAlert("Location retrieved successfully!", "success");
+                    },
+                    function(error) {
+                        console.error("Error getting location:", error);
+                        showAlert("Unable to retrieve your location. Please check your browser permissions.", "error");
+                        button.innerHTML = originalText;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                showAlert("Geolocation is not supported by this browser.", "error");
+                button.innerHTML = originalText;
+            }
+        });
+
+        // Copy location
+        document.getElementById('rent-copy-location').addEventListener('click', function() {
+            const lat = document.getElementById('rent-latitude').value;
+            const lng = document.getElementById('rent-longitude').value;
+            
+            if (!lat || !lng) {
+                showAlert("No location to copy. Please get your location first.", "warning");
+                return;
+            }
+            
+            const locationText = `${lat}, ${lng}`;
+            navigator.clipboard.writeText(locationText).then(
+                function() {
+                    showAlert("Location coordinates copied to clipboard!", "success");
+                },
+                function(err) {
+                    console.error("Could not copy text:", err);
+                    showAlert("Failed to copy location. Please try again.", "error");
+                }
+            );
+        });
 
         function closeRentModal() {
             rentModal.classList.remove('active');
@@ -1915,7 +2128,7 @@
             const duration = parseInt(rentDuration.value);
             
             if (!productId || !duration || duration <= 0) {
-                alert("Please enter a valid duration");
+                showAlert("Please enter a valid duration", "warning");
                 return;
             }
             
@@ -1926,13 +2139,13 @@
                 await contract.methods.rentProduct(productId, duration * 3600, 0, 0)
                     .send({ from: account, value: totalRent });
                 
-                alert("Product rented successfully!");
+                showAlert("Product rented successfully!", "success");
                 closeRentModal();
                 await loadProducts();
                 await updateBalance();
             } catch (error) {
                 console.error("Error renting product:", error);
-                alert("Transaction failed. Please try again.");
+                showAlert("Transaction failed. Please try again.", "error");
             }
         }
 
@@ -1949,12 +2162,12 @@
             const allowSubrenting = document.getElementById('allow-subrenting').checked;
             
             if (!name || !price) {
-                alert("Please fill in all required fields");
+                showAlert("Please fill in all required fields", "warning");
                 return;
             }
             
             if (!latitude || !longitude) {
-                alert("Please set a location for your product");
+                showAlert("Please set a location for your product", "warning");
                 return;
             }
             
@@ -1969,7 +2182,7 @@
                 await contract.methods.addProduct(name, priceInWei, latInt, longInt, radius, allowSubrenting)
                     .send({ from: account });
                 
-                alert("Product added successfully!");
+                showAlert("Product added successfully!", "success");
                 addProductForm.reset();
                 document.getElementById('product-latitude').value = '';
                 document.getElementById('product-longitude').value = '';
@@ -1985,7 +2198,7 @@
                 await loadProductsOnMap();
             } catch (error) {
                 console.error("Error adding product:", error);
-                alert("Failed to add product. Please try again.");
+                showAlert("Failed to add product. Please try again.", "error");
             }
         }
 
@@ -1996,7 +2209,7 @@
             const email = document.getElementById('user-email').value;
             
             // In a real app, you would save these to a database or local storage
-            alert("Settings saved successfully!");
+            showAlert("Settings saved successfully!", "success");
         }
 
         // Utility functions
@@ -2278,6 +2491,50 @@
 
         // Initialize the app when the window loads
         window.onload = init;
+
+        // Custom Alert System
+        function showAlert(message, type = 'info') {
+            const alert = document.getElementById('customAlert');
+            const overlay = document.getElementById('alertOverlay');
+            const messageEl = document.getElementById('alertMessage');
+            const iconEl = alert.querySelector('.custom-alert-icon i');
+            
+            // Set icon and type
+            alert.setAttribute('data-type', type);
+            switch(type) {
+                case 'success':
+                    iconEl.className = 'fas fa-check-circle';
+                    break;
+                case 'error':
+                    iconEl.className = 'fas fa-exclamation-circle';
+                    break;
+                case 'warning':
+                    iconEl.className = 'fas fa-exclamation-triangle';
+                    break;
+                default:
+                    iconEl.className = 'fas fa-info-circle';
+            }
+            
+            messageEl.textContent = message;
+            overlay.classList.add('show');
+            alert.classList.add('show');
+            
+            // Auto close after 5 seconds
+            setTimeout(() => {
+                hideAlert();
+            }, 5000);
+        }
+        
+        function hideAlert() {
+            const alert = document.getElementById('customAlert');
+            const overlay = document.getElementById('alertOverlay');
+            alert.classList.remove('show');
+            overlay.classList.remove('show');
+        }
+        
+        // Close alert when clicking close button or overlay
+        document.getElementById('alertClose').addEventListener('click', hideAlert);
+        document.getElementById('alertOverlay').addEventListener('click', hideAlert);
     </script>
 </body>
 </html>
