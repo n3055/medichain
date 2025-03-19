@@ -23,6 +23,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            scroll-behavior: smooth;
         }
 
         body {
@@ -112,6 +113,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            text-decoration: none;
         }
 
         .navbar-logo span {
@@ -153,12 +155,20 @@
             width: 100%;
         }
 
-        .hero {
+        .navbar-link.active {
+            color: var(--light);
+        }
+
+        .navbar-link.active::after {
+            width: 100%;
+        }
+
+        .section {
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
+            padding: 6rem 2rem 2rem;
             background: radial-gradient(circle at 50% 50%, rgba(123, 104, 238, 0.1), transparent 70%);
         }
 
@@ -166,6 +176,9 @@
             max-width: 1200px;
             width: 100%;
             margin: 0 auto;
+        }
+
+        .hero .container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 4rem;
@@ -355,13 +368,13 @@
             max-width: 80%;
         }
 
-        .features {
+        .features-list {
             display: flex;
             gap: 1.5rem;
             margin-top: 2rem;
         }
 
-        .feature {
+        .feature-item {
             background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
             padding: 1rem;
@@ -388,6 +401,312 @@
             color: var(--gray);
         }
 
+        /* Features Section */
+        .features-section .container {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            background: linear-gradient(90deg, var(--light), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--gray);
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1);
+        }
+
+        .feature-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .feature-card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--light);
+        }
+
+        .feature-card-description {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* About Section */
+        .about-section .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .about-image-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(123, 104, 238, 0.1));
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .about-image-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(0, 229, 255, 0.3), transparent 30%);
+            animation: rotate 10s linear infinite;
+        }
+
+        .about-image-container::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            background: var(--darker);
+            border-radius: 17px;
+            z-index: 1;
+        }
+
+        .about-image-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .about-content {
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .about-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            background: linear-gradient(90deg, var(--light), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .about-description {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .team-member {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1);
+        }
+
+        .team-member-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--dark);
+        }
+
+        .team-member-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+
+        .team-member-role {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .team-member-social {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .social-link {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--dark);
+        }
+
+        /* Contact Section */
+        .contact-section .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .contact-form {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--gray);
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 229, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .contact-text {
+            flex: 1;
+        }
+
+        .contact-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+
+        .contact-details {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
         footer {
             background: rgba(6, 10, 18, 0.8);
             backdrop-filter: blur(10px);
@@ -409,28 +728,88 @@
             }
         }
 
+        /* Mobile menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker);
+            z-index: 200;
+            padding: 2rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .mobile-menu-link {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 1rem;
+            transition: color 0.3s;
+        }
+
+        .mobile-menu-link:hover {
+            color: var(--primary);
+        }
+
         /* Responsive styles */
         @media (max-width: 1024px) {
             .container {
                 gap: 2rem;
             }
             
-            .hero-title {
+            .hero-title, .about-title {
                 font-size: 2.75rem;
+            }
+
+            .section-title {
+                font-size: 2.25rem;
             }
         }
 
         @media (max-width: 768px) {
-            .container {
+            .hero .container, .about-section .container, .contact-section .container {
                 grid-template-columns: 1fr;
                 gap: 3rem;
             }
             
-            .hero-content {
+            .hero-content, .about-content {
                 order: 1;
             }
             
-            .hero-image {
+            .hero-image, .about-image {
                 order: 0;
             }
             
@@ -438,7 +817,15 @@
                 display: none;
             }
             
-            .hero-title {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .mobile-menu {
+                display: flex;
+            }
+            
+            .hero-title, .about-title {
                 font-size: 2.5rem;
             }
             
@@ -450,27 +837,39 @@
             .btn {
                 width: 100%;
             }
+
+            .section-title {
+                font-size: 2rem;
+            }
         }
 
         @media (max-width: 480px) {
-            .hero {
-                padding: 1rem;
+            .section {
+                padding: 6rem 1rem 1rem;
             }
             
-            .hero-title {
+            .hero-title, .about-title {
                 font-size: 2rem;
             }
             
-            .hero-subtitle {
+            .hero-subtitle, .about-description {
                 font-size: 1rem;
             }
             
-            .hero-image-container {
+            .hero-image-container, .about-image-container {
                 height: 300px;
             }
             
-            .features {
+            .features-list {
                 flex-direction: column;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .section-subtitle {
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -481,38 +880,51 @@
     
     <div class="page-wrapper">
         <nav class="navbar">
-            <div class="navbar-logo">
+            <a href="#home" class="navbar-logo">
                 <i class="fas fa-link" style="color: var(--primary);"></i>
                 <span>Medichain</span>
-            </div>
+            </a>
             <div class="navbar-links">
-                <a href="#" class="navbar-link">Home</a>
-                <a href="#" class="navbar-link">Features</a>
-                <a href="#" class="navbar-link">About</a>
-                <a href="#" class="navbar-link">Contact</a>
+                <a href="#home" class="navbar-link active">Home</a>
+                <a href="#features" class="navbar-link">Features</a>
+                <a href="#about" class="navbar-link">About</a>
+                <a href="#contact" class="navbar-link">Contact</a>
             </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
         </nav>
+
+        <div class="mobile-menu" id="mobileMenu">
+            <button class="mobile-menu-close" id="mobileMenuClose">
+                <i class="fas fa-times"></i>
+            </button>
+            <a href="#home" class="mobile-menu-link">Home</a>
+            <a href="#features" class="mobile-menu-link">Features</a>
+            <a href="#about" class="mobile-menu-link">About</a>
+            <a href="#contact" class="mobile-menu-link">Contact</a>
+        </div>
         
-        <section class="hero">
+        <section id="home" class="section hero">
             <div class="container">
                 <div class="hero-content">
                     <h1 class="hero-title">Revolutionizing Medical Equipment Rental</h1>
                     <p class="hero-subtitle">Our blockchain-powered platform ensures secure, transparent, and efficient transactions for healthcare providers and patients alike.</p>
                     
-                    <div class="features">
-                        <div class="feature">
+                    <div class="features-list">
+                        <div class="feature-item">
                             <div class="feature-icon">
                                 <i class="fas fa-shield-alt"></i>
                             </div>
                             <div class="feature-text">Secure Transactions</div>
                         </div>
-                        <div class="feature">
+                        <div class="feature-item">
                             <div class="feature-icon">
                                 <i class="fas fa-sync-alt"></i>
                             </div>
                             <div class="feature-text">Transparent Process</div>
                         </div>
-                        <div class="feature">
+                        <div class="feature-item">
                             <div class="feature-icon">
                                 <i class="fas fa-bolt"></i>
                             </div>
@@ -525,10 +937,10 @@
                             <i class="fab fa-ethereum"></i>
                             Connect Wallet
                         </button>
-                        <button class="btn btn-secondary">
+                        <a href="#features" class="btn btn-secondary">
                             <i class="fas fa-info-circle"></i>
                             Learn More
-                        </button>
+                        </a>
                     </div>
                 </div>
                 
@@ -540,6 +952,216 @@
                             </div>
                             <div class="hero-image-text">Medical Equipment Rental</div>
                             <div class="hero-image-subtext">Join us in making medical equipment rental easier and more accessible for everyone.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="section features-section">
+            <div class="container">
+                <h2 class="section-title">Our Platform Features</h2>
+                <p class="section-subtitle">Discover how Medichain is transforming the medical equipment rental industry with cutting-edge blockchain technology.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-card-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3 class="feature-card-title">Secure Blockchain Technology</h3>
+                        <p class="feature-card-description">Our platform leverages blockchain technology to ensure all transactions are secure, immutable, and transparent, providing peace of mind for all parties involved.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="feature-card-title">Equipment Tracking</h3>
+                        <p class="feature-card-description">Real-time tracking of medical equipment ensures you always know the location and status of your rentals, reducing loss and improving inventory management.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3 class="feature-card-title">Smart Contracts</h3>
+                        <p class="feature-card-description">Automated smart contracts handle the rental agreements, payments, and returns, eliminating paperwork and reducing administrative overhead.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="feature-card-title">Mobile Accessibility</h3>
+                        <p class="feature-card-description">Access our platform from anywhere using our mobile-responsive website or dedicated app, making equipment rental management convenient.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="feature-card-title">Analytics Dashboard</h3>
+                        <p class="feature-card-description">Comprehensive analytics provide insights into equipment usage, rental patterns, and financial performance to optimize your business.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="feature-card-title">Community Marketplace</h3>
+                        <p class="feature-card-description">Connect with healthcare providers and patients in our community marketplace to expand your rental options and reach new customers.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="about" class="section about-section">
+            <div class="container">
+                <div class="about-content">
+                    <h2 class="about-title">About Medichain</h2>
+                    <p class="about-description">Founded in 2023, Medichain is on a mission to revolutionize the medical equipment rental industry. We believe that access to quality medical equipment should be simple, transparent, and affordable for everyone.</p>
+                    <p class="about-description">Our team of healthcare professionals, blockchain experts, and technology innovators have come together to create a platform that addresses the challenges faced by both healthcare providers and patients in the equipment rental process.</p>
+                    
+                    <h3 class="feature-card-title" style="margin-top: 2rem;">Our Team</h3>
+                    <div class="team-grid">
+                        <div class="team-member">
+                            <div class="team-member-image">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 class="team-member-name">Rishi Anand</h4>
+                            <p class="team-member-role">Team Member</p>
+                            <div class="team-member-social">
+                                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            </div>
+                        </div>
+                        
+                        <div class="team-member">
+                            <div class="team-member-image">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 class="team-member-name">Sankeerth S B</h4>
+                            <p class="team-member-role">Team Member</p>
+                            <div class="team-member-social">
+                                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                            </div>
+                        </div>
+                        
+                        <div class="team-member">
+                            <div class="team-member-image">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 class="team-member-name">Bharath S</h4>
+                            <p class="team-member-role">Team Member</p>
+                            <div class="team-member-social">
+                                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="team-member">
+                            <div class="team-member-image">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 class="team-member-name">Harshath R</h4>
+                            <p class="team-member-role">Team Member</p>
+                            <div class="team-member-social">
+                                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                
+                <div class="about-image">
+                    <div class="about-image-container">
+                        <div class="about-image-content">
+                            <div class="hero-image-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="hero-image-text">Our Mission</div>
+                            <div class="hero-image-subtext">To create a more accessible and efficient medical equipment rental ecosystem through blockchain technology.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="section contact-section">
+            <div class="container">
+                <div class="contact-form">
+                    <h2 class="section-title">Get In Touch</h2>
+                    <p class="section-subtitle">Have questions about our platform? Reach out to us and we'll get back to you as soon as possible.</p>
+                    
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" id="name" class="form-input" placeholder="Your name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-input" placeholder="Your email address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea id="message" class="form-textarea" placeholder="Your message" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h3 class="contact-title">Our Location</h3>
+                            <p class="contact-details">MVJCE<br>Whitefield,Bangalore<br>Karnataka</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h3 class="contact-title">Email Us</h3>
+                            <p class="contact-details">info@medichain.io<br>support@medichain.io</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h3 class="contact-title">Call Us</h3>
+                            <p class="contact-details">+91 777888999<br>Mon-Fri, 9am-5pm PST</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h3 class="contact-title">Social Media</h3>
+                            <div class="team-member-social" style="justify-content: flex-start; margin-top: 0.5rem;">
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -601,6 +1223,73 @@
                 alert("MetaMask is not installed. Please install it to connect your wallet.");
             }
         });
+
+        // Mobile menu functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+        });
+
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+        });
+
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Navigation active state
+        const navLinks = document.querySelectorAll('.navbar-link');
+        const sections = document.querySelectorAll('.section');
+
+        function setActiveLink() {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', setActiveLink);
+
+        // Contact form submission
+        const contactForm = document.getElementById('contactForm');
+        
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            // Here you would typically send the form data to your server
+            console.log('Form submitted:', { name, email, message });
+            
+            // Show success message
+            alert('Thank you for your message! We will get back to you soon.');
+            
+            // Reset form
+            contactForm.reset();
+        });
     </script>
 </body>
 </html>
+
