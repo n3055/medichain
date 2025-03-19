@@ -1702,7 +1702,8 @@
         let web3;
         let contract;
         let account;
-        const contractAddress = "0x87cd65f6d1faC2b428B8F928b8FF7Cc7293CEA78";
+        //const contractAddress = "0x87cd65f6d1faC2b428B8F928b8FF7Cc7293CEA78";
+        const contractAddress = "0x4037284377cE1a567533fD1fCCf13306ccD556C1";
         let currentPage = "dashboard";
 
         // DOM Elements
@@ -1724,6 +1725,8 @@
         const rentProductId = document.getElementById('rent-product-id');
         const rentProductName = document.getElementById('rent-product-name');
         const rentDuration = document.getElementById('rent-duration');
+        const rentLatitude = document.getElementById('rent-latitude');
+        const rentLongitude = document.getElementById('rent-longitude');
         const rentTotal = document.getElementById('rent-total').querySelector('span');
         
         // Forms
@@ -1916,7 +1919,7 @@
         // Contract interaction
         async function loadContract() {
             try {
-                const response = await fetch("{% static 'ABI.json' %}");
+                const response = await fetch("{% static 'ABI2.json' %}");
                 const contractABI = await response.json();
                 contract = new web3.eth.Contract(contractABI, contractAddress);
             } catch (error) {
@@ -2125,6 +2128,8 @@
 
         async function confirmRental() {
             const productId = rentProductId.value;
+            const rentLongitude = Math.round(parseFloat(document.getElementById('rent-longitude').value) * 1000000);
+            const rentLatitude = Math.round(parseFloat(document.getElementById('rent-latitude').value) * 1000000);
             const duration = parseInt(rentDuration.value);
             
             if (!productId || !duration || duration <= 0) {
@@ -2136,7 +2141,7 @@
                 const product = await getProduct(productId);
                 const totalRent = web3.utils.toWei((duration * web3.utils.fromWei(product.priceInWei, 'ether')).toString(), 'ether');
                 
-                await contract.methods.rentProduct(productId, duration * 3600, 0, 0)
+                await contract.methods.rentProduct(productId, duration * 3600, rentLatitude, rentLongitude)
                     .send({ from: account, value: totalRent });
                 
                 showAlert("Product rented successfully!", "success");
