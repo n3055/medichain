@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.5/web3.min.js"></script>
+    <script src='https://cdn.jotfor.ms/s/umd/latest/for-embedded-agent.js'></script>
     <style>
         :root {
             --primary: #00E5FF;
@@ -625,6 +626,116 @@
             margin-top: 0.5rem;
         }
 
+        /* Toggle Switch Styles */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .info-icon {
+            color: var(--gray);
+            font-size: 1rem;
+            cursor: help;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .info-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--darker);
+            color: var(--light);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: normal;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            width: max-content;
+            max-width: 250px;
+            z-index: 100;
+        }
+
+        .info-icon:hover .info-tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: calc(100% + 10px);
+        }
+
+        .info-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--darker);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
         .location-inputs {
             display: flex;
             gap: 1rem;
@@ -639,6 +750,72 @@
 
         .location-coordinates .form-control {
             flex: 1;
+        }
+
+        .radius-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            padding: 1.5rem 0;
+        }
+
+        .radius-selector input[type="range"] {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, var(--primary) var(--range-progress), rgba(255, 255, 255, 0.1) var(--range-progress));
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .radius-selector input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .radius-value-display {
+            position: absolute;
+            background: #fff;
+            color: var(--dark);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            transform: translateX(-50%);
+            bottom: calc(100% - 1rem);
+            left: var(--value-position);
+            min-width: 60px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: left 0.1s ease;
+        }
+
+        .radius-value-display::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #fff;
+        }
+
+        .radius-selector input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .radius-selector input[type="range"]:active::-webkit-slider-thumb {
+            transform: scale(1.2);
         }
 
         .map-popup {
@@ -887,6 +1064,45 @@
         .text-info {
             color: var(--info);
         }
+
+        /* Map Location Button Styles */
+        .map-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .map-location-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--darker);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            color: var(--light);
+        }
+
+        .map-location-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .map-location-btn i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+
+        .user-location-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-location-marker i {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
     </style>
 </head>
 <body>
@@ -991,6 +1207,32 @@
                                 </button>
                             </div>
                         </div>
+
+                        <script>
+                          window.addEventListener("DOMContentLoaded", function() {
+                            window.AgentInitializer.init({
+                              agentRenderURL: "https://agent.jotform.com/0195acef6ba2785686ac249d516aa5d4b50e",
+                              rootId: "JotformAgent-0195acef6ba2785686ac249d516aa5d4b50e",
+                              formID: "0195acef6ba2785686ac249d516aa5d4b50e",
+                              queryParams: ["skipWelcome=1", "maximizable=1"],
+                              domain: "https://www.jotform.com",
+                              isDraggable: false,
+                              background: "linear-gradient(180deg, #D3CBF4 0%, #D3CBF4 100%)",
+                              buttonBackgroundColor: "#8797FF",
+                              buttonIconColor: "#FFFFFF",
+                              variant: false,
+                              customizations: {
+                                "greeting": "Yes",
+                                "greetingMessage": "Hi! How can I assist you?",
+                                "openByDefault": "No",
+                                "pulse": "Yes",
+                                "position": "right",
+                                "autoOpenChatIn": "0"
+                              },
+                              isVoice: undefined
+                            });
+                          });
+                        </script>
 
                         <div class="stats-grid">
                             <div class="stat-card">
@@ -1099,14 +1341,6 @@
                                 <textarea class="form-control" id="product-description" rows="4" placeholder="Enter product description"></textarea>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="product-category">Category</label>
-                                <select class="form-control" id="product-category">
-                                    <option value="medical">Medical</option>
-                                    <option value="equipment">Equipment</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
                                 <label class="form-label">Location</label>
                                 <div class="location-inputs">
                                     <div class="location-coordinates">
@@ -1119,6 +1353,33 @@
                                     </button>
                                 </div>
                                 <div class="form-text">Click the button to automatically fetch your current location</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="rental-radius">Rental Radius (km)</label>
+                                <div class="radius-selector">
+                                    <input type="range" class="form-control" id="rental-radius" min="1" max="50" value="5" step="1">
+                                    <div class="radius-value-display">
+                                        <span id="radius-value">5</span> km
+                                    </div>
+                                </div>
+                                <div class="form-text">Select the radius within which you want to rent your product</div>
+                            </div>
+                            <div class="form-group">
+                                <div class="toggle-container">
+                                    <label class="toggle-label">
+                                        Allow Sub-renting
+                                        <div class="info-icon">
+                                            <i class="fas fa-info-circle"></i>
+                                            <div class="info-tooltip">
+                                                Sub-renting allows the renter to rent this product to other users while they have it rented, creating a rental chain. You'll still earn your original rental fee.
+                                            </div>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="allow-subrenting">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </label>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div id="location-map" style="height: 300px; border-radius: 12px;"></div>
@@ -1235,7 +1496,13 @@
                             <div class="filter-option">My Products</div>
                         </div>
                     </div>
-                    <div id="products-map" style="height: 600px; border-radius: 12px;"></div>
+                    <div class="map-container" style="position: relative;">
+                        <div id="products-map" style="height: 600px; border-radius: 12px;"></div>
+                        <button class="btn btn-primary map-location-btn" id="map-location-btn">
+                            <i class="fas fa-location-crosshairs"></i>
+                            Current Location
+                        </button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -1316,6 +1583,31 @@
             setupEventListeners();
             await checkWalletConnection();
             initMaps();
+            
+            // Initialize chatbot
+            window.addEventListener("DOMContentLoaded", function() {
+                window.AgentInitializer.init({
+                    agentRenderURL: "https://agent.jotform.com/0195acef6ba2785686ac249d516aa5d4b50e",
+                    rootId: "JotformAgent-0195acef6ba2785686ac249d516aa5d4b50e",
+                    formID: "0195acef6ba2785686ac249d516aa5d4b50e",
+                    queryParams: ["skipWelcome=1", "maximizable=1"],
+                    domain: "https://www.jotform.com",
+                    isDraggable: false,
+                    background: "linear-gradient(180deg, #D3CBF4 0%, #D3CBF4 100%)",
+                    buttonBackgroundColor: "#8797FF",
+                    buttonIconColor: "#FFFFFF",
+                    variant: false,
+                    customizations: {
+                        "greeting": "Yes",
+                        "greetingMessage": "Hi! How can I assist you?",
+                        "openByDefault": "No",
+                        "pulse": "Yes",
+                        "position": "right",
+                        "autoOpenChatIn": "0"
+                    },
+                    isVoice:true
+                });
+            });
         }
 
         // Setup event listeners
@@ -1386,6 +1678,12 @@
             
             // Update current page
             currentPage = pageName;
+            
+            // Show/hide chatbot based on current page
+            const chatbotContainer = document.getElementById('JotformAgent-0195acef6ba2785686ac249d516aa5d4b50e');
+            if (chatbotContainer) {
+                chatbotContainer.style.display = pageName === 'dashboard' ? 'block' : 'none';
+            }
             
             // Special handling for map pages
             if (pageName === 'map-view') {
@@ -1645,9 +1943,10 @@
             const name = document.getElementById('product-name').value;
             const price = document.getElementById('product-price').value;
             const description = document.getElementById('product-description').value;
-            const category = document.getElementById('product-category').value;
             const latitude = document.getElementById('product-latitude').value;
             const longitude = document.getElementById('product-longitude').value;
+            const radius = document.getElementById('rental-radius').value;
+            const allowSubrenting = document.getElementById('allow-subrenting').checked;
             
             if (!name || !price) {
                 alert("Please fill in all required fields");
@@ -1666,13 +1965,15 @@
                 const latInt = Math.round(parseFloat(latitude) * 1000000);
                 const longInt = Math.round(parseFloat(longitude) * 1000000);
                 
-                await contract.methods.addProduct(name, priceInWei, latInt, longInt)
+                // Add product with sub-renting option
+                await contract.methods.addProduct(name, priceInWei, latInt, longInt, radius, allowSubrenting)
                     .send({ from: account });
                 
                 alert("Product added successfully!");
                 addProductForm.reset();
                 document.getElementById('product-latitude').value = '';
                 document.getElementById('product-longitude').value = '';
+                document.getElementById('allow-subrenting').checked = false;
                 
                 // Reset the map
                 if (addProductMap) {
@@ -1708,11 +2009,13 @@
         let addProductMarker = null;
         let productsMap = null;
         let productMarkers = [];
+        let radiusCircle = null;
 
         // Initialize maps
         function initMaps() {
             initAddProductMap();
             initProductsMap();
+            initRadiusSelector();
         }
 
         // Initialize the map in the Add Product form
@@ -1742,7 +2045,119 @@
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(productsMap);
+
+                // Add event listener for the current location button
+                document.getElementById('map-location-btn').addEventListener('click', function() {
+                    if (navigator.geolocation) {
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                const lat = position.coords.latitude;
+                                const lng = position.coords.longitude;
+                                
+                                // Center map on current location with zoom level 13
+                                productsMap.setView([lat, lng], 13);
+                                
+                                // Add or update the user location marker
+                                if (window.userLocationMarker) {
+                                    window.userLocationMarker.setLatLng([lat, lng]);
+                                } else {
+                                    window.userLocationMarker = L.marker([lat, lng], {
+                                        icon: L.divIcon({
+                                            className: 'user-location-marker',
+                                            html: '<i class="fas fa-circle" style="color: var(--primary); font-size: 12px;"></i>',
+                                            iconSize: [12, 12],
+                                            iconAnchor: [6, 6]
+                                        })
+                                    }).addTo(productsMap);
+                                }
+                                
+                                // Add or update the accuracy circle
+                                if (window.accuracyCircle) {
+                                    productsMap.removeLayer(window.accuracyCircle);
+                                }
+                                window.accuracyCircle = L.circle([lat, lng], {
+                                    radius: position.coords.accuracy / 2,
+                                    color: 'var(--primary)',
+                                    fillColor: 'var(--primary)',
+                                    fillOpacity: 0.1,
+                                    weight: 1
+                                }).addTo(productsMap);
+
+                                // Reset button text
+                                document.getElementById('map-location-btn').innerHTML = '<i class="fas fa-location-crosshairs"></i> Current Location';
+                            },
+                            function(error) {
+                                console.error("Error getting location:", error);
+                                alert("Unable to retrieve your location. Please check your browser permissions and try again.");
+                                // Reset button text
+                                document.getElementById('map-location-btn').innerHTML = '<i class="fas fa-location-crosshairs"></i> Current Location';
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 5000,
+                                maximumAge: 0
+                            }
+                        );
+                    } else {
+                        alert("Geolocation is not supported by this browser.");
+                    }
+                });
             }
+        }
+
+        // Initialize radius selector
+        function initRadiusSelector() {
+            const radiusInput = document.getElementById('rental-radius');
+            const radiusValue = document.getElementById('radius-value');
+            const radiusDisplay = radiusValue.parentElement;
+            
+            if (radiusInput && radiusValue) {
+                // Set initial values
+                updateSliderGradient(radiusInput);
+                updateValuePosition(radiusInput, radiusDisplay);
+                
+                radiusInput.addEventListener('input', function() {
+                    radiusValue.textContent = this.value;
+                    updateSliderGradient(this);
+                    updateValuePosition(this, radiusDisplay);
+                    updateRadiusCircle();
+                });
+            }
+        }
+
+        // Update slider gradient
+        function updateSliderGradient(slider) {
+            const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+            slider.style.setProperty('--range-progress', `${value}%`);
+        }
+
+        // Update value bubble position
+        function updateValuePosition(slider, valueDisplay) {
+            const value = (slider.value - slider.min) / (slider.max - slider.min);
+            const position = value * 100;
+            valueDisplay.style.setProperty('--value-position', `${position}%`);
+        }
+
+        // Update radius circle on map
+        function updateRadiusCircle() {
+            if (!addProductMap || !addProductMarker) return;
+            
+            const radius = document.getElementById('rental-radius').value;
+            
+            // Remove existing circle if any
+            if (radiusCircle) {
+                addProductMap.removeLayer(radiusCircle);
+            }
+            
+            // Add new circle
+            radiusCircle = L.circle(addProductMarker.getLatLng(), {
+                radius: radius * 1000, // Convert km to meters
+                color: 'var(--primary)',
+                fillColor: 'var(--primary)',
+                fillOpacity: 0.1,
+                weight: 2
+            }).addTo(addProductMap);
         }
 
         // Get current location
@@ -1780,6 +2195,9 @@
             } else {
                 addProductMarker = L.marker([lat, lng]).addTo(addProductMap);
             }
+            
+            // Update radius circle
+            updateRadiusCircle();
         }
 
         // Load products on map
