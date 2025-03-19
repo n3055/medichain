@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.5/web3.min.js"></script>
     <style>
         :root {
@@ -285,8 +287,8 @@
 
         .dashboard-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.75rem;
             font-weight: 700;
+            font-size: 1.75rem;
             background: linear-gradient(90deg, var(--light), var(--primary));
             -webkit-background-clip: text;
             background-clip: text;
@@ -623,12 +625,84 @@
             margin-top: 0.5rem;
         }
 
-        .modal-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        .location-inputs {
             display: flex;
-            justify-content: flex-end;
             gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .location-coordinates {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .location-coordinates .form-control {
+            flex: 1;
+        }
+
+        .map-popup {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .map-popup-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .map-popup-price {
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .map-popup-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .map-popup-status.available {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .map-popup-status.unavailable {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+        }
+
+        .map-popup-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .map-popup-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+            background: var(--darker);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .leaflet-popup-tip {
+            background: var(--darker);
+        }
+
+        .leaflet-container a.leaflet-popup-close-button {
+            color: var(--gray);
+        }
+
+        .leaflet-container a.leaflet-popup-close-button:hover {
+            color: var(--light);
         }
 
         /* Order Status Styles */
@@ -855,6 +929,12 @@
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link" data-page="map-view">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span>Map View</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
                         <a href="#" class="sidebar-menu-link" data-page="settings">
                             <i class="fas fa-cog"></i>
                             <span>Settings</span>
@@ -1026,6 +1106,23 @@
                                     <option value="other">Other</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label class="form-label">Location</label>
+                                <div class="location-inputs">
+                                    <div class="location-coordinates">
+                                        <input type="text" class="form-control" id="product-latitude" placeholder="Latitude" readonly>
+                                        <input type="text" class="form-control" id="product-longitude" placeholder="Longitude" readonly>
+                                    </div>
+                                    <button type="button" class="btn btn-outline" id="get-location-btn">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        Get Current Location
+                                    </button>
+                                </div>
+                                <div class="form-text">Click the button to automatically fetch your current location</div>
+                            </div>
+                            <div class="form-group">
+                                <div id="location-map" style="height: 300px; border-radius: 12px;"></div>
+                            </div>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus-circle"></i>
                                 Add Product
@@ -1128,6 +1225,18 @@
                         </form>
                     </div>
                 </div>
+                <!-- Map View Page -->
+                <div class="page hidden" id="map-view-page">
+                    <div class="dashboard-header">
+                        <h2 class="dashboard-title">Product Map</h2>
+                        <div class="filter-options">
+                            <div class="filter-option active">All Products</div>
+                            <div class="filter-option">Available Only</div>
+                            <div class="filter-option">My Products</div>
+                        </div>
+                    </div>
+                    <div id="products-map" style="height: 600px; border-radius: 12px;"></div>
+                </div>
             </div>
         </main>
     </div>
@@ -1206,6 +1315,7 @@
         async function init() {
             setupEventListeners();
             await checkWalletConnection();
+            initMaps();
         }
 
         // Setup event listeners
@@ -1272,10 +1382,28 @@
             });
             
             // Update page title
-            pageTitle.textContent = pageName.charAt(0).toUpperCase() + pageName.slice(1);
+            pageTitle.textContent = pageName.charAt(0).toUpperCase() + pageName.slice(1).replace('-', ' ');
             
             // Update current page
             currentPage = pageName;
+            
+            // Special handling for map pages
+            if (pageName === 'map-view') {
+                // Need to refresh the map when it becomes visible
+                setTimeout(() => {
+                    if (productsMap) {
+                        productsMap.invalidateSize();
+                        loadProductsOnMap();
+                    }
+                }, 100);
+            } else if (pageName === 'add-product') {
+                // Refresh the add product map
+                setTimeout(() => {
+                    if (addProductMap) {
+                        addProductMap.invalidateSize();
+                    }
+                }, 100);
+            }
         }
 
         // Wallet connection
@@ -1358,12 +1486,26 @@
 
         async function getProduct(productId) {
             try {
-                return await contract.methods.products(productId).call();
-            } catch (error) {
-                console.error(`Error fetching product ${productId}:`, error);
-                return null;
+                const product = await contract.methods.products(productId).call();
+        
+            // If your contract doesn't return lat/long directly, you might need to call a separate method
+            // This is a placeholder - adjust based on your actual contract structure
+            try {
+                const locationData = await contract.methods.getProductLocation(productId).call();
+                product.latitude = locationData.latitude;
+                product.longitude = locationData.longitude;
+            } catch (e) {
+                // If location method doesn't exist or fails, set defaults
+                product.latitude = 0;
+                product.longitude = 0;
             }
+        
+            return product;
+        } catch (error) {
+            console.error(`Error fetching product ${productId}:`, error);
+            return null;
         }
+    }
 
         async function loadProducts() {
             const productContainer = document.getElementById("product-container");
@@ -1398,6 +1540,9 @@
                         openRentModal(productId, productName, productPrice);
                     });
                 });
+                
+                // Also load products on the map
+                await loadProductsOnMap();
             } catch (error) {
                 console.error("Error loading products:", error);
             }
@@ -1501,21 +1646,42 @@
             const price = document.getElementById('product-price').value;
             const description = document.getElementById('product-description').value;
             const category = document.getElementById('product-category').value;
+            const latitude = document.getElementById('product-latitude').value;
+            const longitude = document.getElementById('product-longitude').value;
             
             if (!name || !price) {
                 alert("Please fill in all required fields");
                 return;
             }
             
+            if (!latitude || !longitude) {
+                alert("Please set a location for your product");
+                return;
+            }
+            
             try {
                 const priceInWei = web3.utils.toWei(price.toString(), 'ether');
                 
-                await contract.methods.addProduct(name, priceInWei)
+                // Convert latitude and longitude to integers (multiplied by 1e6 to preserve precision)
+                const latInt = Math.round(parseFloat(latitude) * 1000000);
+                const longInt = Math.round(parseFloat(longitude) * 1000000);
+                
+                await contract.methods.addProduct(name, priceInWei, latInt, longInt)
                     .send({ from: account });
                 
                 alert("Product added successfully!");
                 addProductForm.reset();
+                document.getElementById('product-latitude').value = '';
+                document.getElementById('product-longitude').value = '';
+                
+                // Reset the map
+                if (addProductMap) {
+                    addProductMap.remove();
+                    initAddProductMap();
+                }
+                
                 await loadProducts();
+                await loadProductsOnMap();
             } catch (error) {
                 console.error("Error adding product:", error);
                 alert("Failed to add product. Please try again.");
@@ -1537,8 +1703,164 @@
             return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
         }
 
+        // Map variables
+        let addProductMap = null;
+        let addProductMarker = null;
+        let productsMap = null;
+        let productMarkers = [];
+
+        // Initialize maps
+        function initMaps() {
+            initAddProductMap();
+            initProductsMap();
+        }
+
+        // Initialize the map in the Add Product form
+        function initAddProductMap() {
+            if (document.getElementById('location-map')) {
+                addProductMap = L.map('location-map').setView([0, 0], 2);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(addProductMap);
+                
+                // Add click event to set location
+                addProductMap.on('click', function(e) {
+                    setProductLocation(e.latlng.lat, e.latlng.lng);
+                });
+                
+                // Get location button
+                document.getElementById('get-location-btn').addEventListener('click', getCurrentLocation);
+            }
+        }
+
+        // Initialize the products map
+        function initProductsMap() {
+            if (document.getElementById('products-map')) {
+                productsMap = L.map('products-map').setView([0, 0], 2);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(productsMap);
+            }
+        }
+
+        // Get current location
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        setProductLocation(lat, lng);
+                        
+                        // Center map on current location
+                        if (addProductMap) {
+                            addProductMap.setView([lat, lng], 13);
+                        }
+                    },
+                    function(error) {
+                        console.error("Error getting location:", error);
+                        alert("Unable to retrieve your location. Please try again or set it manually on the map.");
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Set product location
+        function setProductLocation(lat, lng) {
+            document.getElementById('product-latitude').value = lat.toFixed(6);
+            document.getElementById('product-longitude').value = lng.toFixed(6);
+            
+            // Update or add marker
+            if (addProductMarker) {
+                addProductMarker.setLatLng([lat, lng]);
+            } else {
+                addProductMarker = L.marker([lat, lng]).addTo(addProductMap);
+            }
+        }
+
+        // Load products on map
+        async function loadProductsOnMap() {
+            if (!productsMap || !contract) return;
+            
+            // Clear existing markers
+            productMarkers.forEach(marker => productsMap.removeLayer(marker));
+            productMarkers = [];
+            
+            // Bounds for auto-zooming
+            const bounds = L.latLngBounds();
+            let hasProducts = false;
+            
+            try {
+                for (let i = 0; i < 20; i++) { // Load up to 20 products
+                    const product = await getProduct(i);
+                    if (product && product.name) {
+                        // Check if product has location data
+                        // Assuming the contract returns lat and long as additional properties
+                        // If not, you'll need to modify this based on your contract structure
+                        if (product.latitude && product.longitude) {
+                            // Convert from integer to float (assuming stored as int * 1e6)
+                            const lat = parseInt(product.latitude) / 1000000;
+                            const lng = parseInt(product.longitude) / 1000000;
+                            
+                            if (isNaN(lat) || isNaN(lng)) continue;
+                            
+                            const marker = L.marker([lat, lng]).addTo(productsMap);
+                            
+                            // Create popup content
+                            const priceInEth = web3.utils.fromWei(product.priceInWei, 'ether');
+                            const popupContent = `
+                                <div class="map-popup">
+                                    <div class="map-popup-title">${product.name}</div>
+                                    <div class="map-popup-price"><i class="fab fa-ethereum"></i> ${priceInEth} ETH/hour</div>
+                                    <div class="map-popup-status ${product.available ? 'available' : 'unavailable'}">
+                                        ${product.available ? 'Available' : 'Unavailable'}
+                                    </div>
+                                    <div class="map-popup-actions">
+                                        <button class="btn btn-primary map-rent-btn" data-id="${product.pid}" ${product.available ? '' : 'disabled'}>
+                                            Rent
+                                        </button>
+                                        <button class="btn btn-outline">Details</button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            marker.bindPopup(popupContent);
+                            marker.on('click', function() {
+                                // Add event listener to rent button in popup
+                                setTimeout(() => {
+                                    const rentBtn = document.querySelector('.map-rent-btn');
+                                    if (rentBtn) {
+                                        rentBtn.addEventListener('click', function() {
+                                            const productId = this.getAttribute('data-id');
+                                            openRentModal(productId, product.name, priceInEth);
+                                        });
+                                    }
+                                }, 100);
+                            });
+                            
+                            productMarkers.push(marker);
+                            bounds.extend([lat, lng]);
+                            hasProducts = true;
+                        }
+                    }
+                }
+                
+                // Fit map to bounds if we have products
+                if (hasProducts) {
+                    productsMap.fitBounds(bounds, { padding: [50, 50] });
+                }
+            } catch (error) {
+                console.error("Error loading products on map:", error);
+            }
+        }
+
         // Initialize the app when the window loads
         window.onload = init;
     </script>
 </body>
 </html>
+
