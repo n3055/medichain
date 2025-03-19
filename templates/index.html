@@ -1224,6 +1224,35 @@
                 margin: 0 16px;
             }
         }
+
+        /* Details Modal Styles */
+        .details-subrental-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge.enabled {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .badge.disabled {
+            background: rgba(244, 67, 54, 0.2);
+            color: #F44336;
+        }
+
+        .text-muted {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
@@ -1684,6 +1713,54 @@
         </div>
     </div>
 
+    <!-- Product Details Modal -->
+    <div class="modal-overlay" id="details-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Product Details</h3>
+                <button class="modal-close" id="details-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Renter's Address</label>
+                    <input type="text" class="form-control" id="details-renter-address" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rental Start Time</label>
+                    <input type="text" class="form-control" id="details-start-time" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rental Duration</label>
+                    <input type="text" class="form-control" id="details-duration" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location Radius</label>
+                    <input type="text" class="form-control" id="details-radius" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sub-rental Status</label>
+                    <div class="details-subrental-status">
+                        <span id="details-subrental-allowed" class="badge"></span>
+                        <span id="details-subrental-requester" class="text-muted"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Commission Rate</label>
+                    <input type="text" class="form-control" id="details-commission" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <div id="details-map" style="height: 200px; border-radius: 8px; margin-top: 0.5rem;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="details-modal-close-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Alert System -->
     <div class="alert-overlay" id="alertOverlay"></div>
     <div class="custom-alert" id="customAlert">
@@ -2035,7 +2112,7 @@
                             <i class="fas fa-shopping-cart"></i>
                             Rent Now
                         </button>
-                        <button class="btn btn-outline">
+                        <button class="btn btn-outline details-btn" data-id="${product.pid}">
                             <i class="fas fa-info-circle"></i>
                             Details
                         </button>
@@ -2459,7 +2536,7 @@
                                         <button class="btn btn-primary map-rent-btn" data-id="${product.pid}" ${product.available ? '' : 'disabled'}>
                                             Rent
                                         </button>
-                                        <button class="btn btn-outline">Details</button>
+                                        <button class="btn btn-outline details-btn" data-id="${product.pid}">Details</button>
                                     </div>
                                 </div>
                             `;
@@ -2473,6 +2550,13 @@
                                         rentBtn.addEventListener('click', function() {
                                             const productId = this.getAttribute('data-id');
                                             openRentModal(productId, product.name, priceInEth);
+                                        });
+                                    }
+                                    const detailsBtn = document.querySelector('.details-btn');
+                                    if (detailsBtn) {
+                                        detailsBtn.addEventListener('click', function() {
+                                            const productId = this.getAttribute('data-id');
+                                            openDetailsModal(productId);
                                         });
                                     }
                                 }, 100);
@@ -2540,6 +2624,148 @@
         // Close alert when clicking close button or overlay
         document.getElementById('alertClose').addEventListener('click', hideAlert);
         document.getElementById('alertOverlay').addEventListener('click', hideAlert);
+
+        // Details modal functions
+        function openDetailsModal(productId) {
+            const modal = document.getElementById('details-modal');
+            modal.classList.add('active');
+            loadProductDetails(productId);
+        }
+
+        function closeDetailsModal() {
+            const modal = document.getElementById('details-modal');
+            modal.classList.remove('active');
+        }
+
+        async function loadProductDetails(productId) {
+            try {
+                const product = await getProduct(productId);
+                if (!product) {
+                    showAlert("Error loading product details", "error");
+                    return;
+                }
+
+                // Update modal fields
+                document.getElementById('details-renter-address').value = product.renter || 'No current renter';
+                
+                // Format start time
+                const startTime = product.rentalStartTime > 0 
+                    ? new Date(product.rentalStartTime * 1000).toLocaleString()
+                    : 'Not currently rented';
+                document.getElementById('details-start-time').value = startTime;
+                
+                // Format duration
+                const duration = product.rentalDuration > 0
+                    ? `${product.rentalDuration / 3600} hours`
+                    : 'Not set';
+                document.getElementById('details-duration').value = duration;
+                
+                // Set radius
+                document.getElementById('details-radius').value = `${product.radius} km`;
+                
+                // Update sub-rental status
+                const subrental = document.getElementById('details-subrental-allowed');
+                const requester = document.getElementById('details-subrental-requester');
+                subrental.className = 'badge ' + (product.subRentAllowed ? 'enabled' : 'disabled');
+                subrental.textContent = product.subRentAllowed ? 'Enabled' : 'Disabled';
+                
+                if (product.subRentRequester && product.subRentRequester !== '0x0000000000000000000000000000000000000000') {
+                    requester.textContent = `Requested by: ${shortenAddress(product.subRentRequester)}`;
+                } else {
+                    requester.textContent = '';
+                }
+                
+                // Set commission rate
+                document.getElementById('details-commission').value = `${product.commissionRate}%`;
+
+                // Initialize map
+                if (product.latitude && product.longitude) {
+                    const lat = parseInt(product.latitude) / 1000000;
+                    const lng = parseInt(product.longitude) / 1000000;
+                    
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        const detailsMap = L.map('details-map').setView([lat, lng], 13);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '© OpenStreetMap contributors'
+                        }).addTo(detailsMap);
+                        
+                        // Add marker
+                        L.marker([lat, lng]).addTo(detailsMap);
+                        
+                        // Add radius circle
+                        L.circle([lat, lng], {
+                            radius: product.radius * 1000,
+                            color: 'var(--primary)',
+                            fillColor: 'var(--primary)',
+                            fillOpacity: 0.1,
+                            weight: 2
+                        }).addTo(detailsMap);
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading product details:", error);
+                showAlert("Failed to load product details", "error");
+            }
+        }
+
+        // Add event listeners for details modal
+        document.getElementById('details-modal-close').addEventListener('click', closeDetailsModal);
+        document.getElementById('details-modal-close-btn').addEventListener('click', closeDetailsModal);
+
+        // Update product card event listeners
+        function setupProductCardEventListeners() {
+            document.querySelectorAll('.details-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const productId = e.target.getAttribute('data-id');
+                    openDetailsModal(productId);
+                });
+            });
+        }
+
+        // Update loadProducts function to setup details button listeners
+        async function loadProducts() {
+            const productContainer = document.getElementById("product-container");
+            const allProductsContainer = document.getElementById("all-products-container");
+            
+            if (!contract) return;
+            
+            productContainer.innerHTML = "";
+            allProductsContainer.innerHTML = "";
+            
+            try {
+                for (let i = 0; i < 10; i++) { // Load up to 10 products
+                    const product = await getProduct(i);
+                    if (product && product.name) {
+                        // Create product card
+                        const productCard = createProductCard(product);
+                        
+                        // Add to dashboard featured products
+                        productContainer.appendChild(productCard.cloneNode(true));
+                        
+                        // Add to all products page
+                        allProductsContainer.appendChild(productCard);
+                    }
+                }
+                
+                // Add event listeners to rent buttons
+                document.querySelectorAll('.rent-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = e.target.getAttribute('data-id');
+                        const productName = e.target.getAttribute('data-name');
+                        const productPrice = e.target.getAttribute('data-price');
+                        openRentModal(productId, productName, productPrice);
+                    });
+                });
+                
+                // Setup details button listeners
+                setupProductCardEventListeners();
+                
+                // Also load products on the map
+                await loadProductsOnMap();
+            } catch (error) {
+                console.error("Error loading products:", error);
+            }
+        }
     </script>
 </body>
 </html>
