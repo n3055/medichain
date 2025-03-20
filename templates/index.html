@@ -1547,11 +1547,11 @@
                     <div class="dashboard-header">
                         <h2 class="dashboard-title">Order Status</h2>
                         <div class="filter-options">
-                            <div class="filter-option active">All</div>
-                            <div class="filter-option">Pending</div>
-                            <div class="filter-option">Approved</div>
-                            <div class="filter-option">Shipped</div>
-                            <div class="filter-option">Returned</div>
+                            <div class="filter-option active" data-filter="all">All</div>
+                            <div class="filter-option" data-filter="owned">My Products</div>
+                            <div class="filter-option" data-filter="rented">Rented by Me</div>
+                            <div class="filter-option" data-filter="active">Active Rentals</div>
+                            <div class="filter-option" data-filter="available">Available</div>
                         </div>
                     </div>
                     <table class="orders-table">
@@ -1566,46 +1566,7 @@
                             </tr>
                         </thead>
                         <tbody id="orders-table-body">
-                            <tr>
-                                <td>#ORD-001</td>
-                                <td>Oxygen Concentrator</td>
-                                <td>2023-05-15</td>
-                                <td>0.25 ETH</td>
-                                <td><span class="status-badge pending"><i class="fas fa-clock"></i> Pending</span></td>
-                                <td>
-                                    <button class="btn btn-outline btn-sm">View</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#ORD-002</td>
-                                <td>Hospital Bed</td>
-                                <td>2023-05-12</td>
-                                <td>0.5 ETH</td>
-                                <td><span class="status-badge approved"><i class="fas fa-check"></i> Approved</span></td>
-                                <td>
-                                    <button class="btn btn-outline btn-sm">View</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#ORD-003</td>
-                                <td>Wheelchair</td>
-                                <td>2023-05-10</td>
-                                <td>0.15 ETH</td>
-                                <td><span class="status-badge shipped"><i class="fas fa-truck"></i> Shipped</span></td>
-                                <td>
-                                    <button class="btn btn-outline btn-sm">View</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#ORD-004</td>
-                                <td>Blood Pressure Monitor</td>
-                                <td>2023-05-05</td>
-                                <td>0.08 ETH</td>
-                                <td><span class="status-badge returned"><i class="fas fa-undo"></i> Returned</span></td>
-                                <td>
-                                    <button class="btn btn-outline btn-sm">View</button>
-                                </td>
-                            </tr>
+                            <!-- Orders will be dynamically added here -->
                         </tbody>
                     </table>
                 </div>
@@ -1885,6 +1846,9 @@
             
             // Rent duration change
             rentDuration.addEventListener('input', updateRentalTotal);
+            
+            // Setup order filters
+            setupOrderFilters();
         }
 
         // Page navigation
@@ -1934,6 +1898,11 @@
                     }
                 }, 100);
             }
+            
+            // Load orders when visiting the orders page
+            if (pageName === 'orders') {
+                loadOrders();
+            }
         }
 
         // Wallet connection
@@ -1970,6 +1939,7 @@
                     await loadContract();
                     await updateBalance();
                     await loadProducts();
+                    await loadOrders(); // Load orders after connecting wallet
                 } catch (error) {
                     console.error("Error connecting wallet", error);
                     showAlert("Failed to connect wallet. Please try again.", "error");
@@ -2856,6 +2826,161 @@
                 console.error("Error loading nearby products:", error);
                 showAlert("Failed to load nearby products", "error");
             }
+        }
+
+        // Update the Orders page content loading
+        async function loadOrders(filterType = 'all') {
+            const ordersTableBody = document.getElementById('orders-table-body');
+            ordersTableBody.innerHTML = '';
+            
+            if (!contract || !account) {
+                showAlert("Please connect your wallet first", "warning");
+                return;
+            }
+            
+            try {
+                const ownedProducts = [];
+                const rentedProducts = [];
+                
+                // Iterate through products
+                for (let i = 0; i < 20; i++) {
+                    const product = await getProduct(i);
+                    if (product && product.name) {
+                        if (product.owner.toLowerCase() === account.toLowerCase()) {
+                            ownedProducts.push({ ...product, pid: i });
+                        } else if (product.renter && product.renter.toLowerCase() === account.toLowerCase()) {
+                            rentedProducts.push({ ...product, pid: i });
+                        }
+                    }
+                }
+                
+                // Filter products based on selected filter
+                let productsToShow = [];
+                switch (filterType) {
+                    case 'owned':
+                        productsToShow = ownedProducts;
+                        break;
+                    case 'rented':
+                        productsToShow = rentedProducts;
+                        break;
+                    case 'active':
+                        const currentTime = Math.floor(Date.now() / 1000);
+                        productsToShow = [...ownedProducts, ...rentedProducts].filter(product => {
+                            const rentalEndTime = parseInt(product.rentalStartTime) + parseInt(product.rentalDuration);
+                            return !product.available && currentTime < rentalEndTime;
+                        });
+                        break;
+                    case 'available':
+                        productsToShow = ownedProducts.filter(product => product.available);
+                        break;
+                    default: // 'all'
+                        productsToShow = [...ownedProducts, ...rentedProducts];
+                }
+                
+                // Display filtered products
+                if (productsToShow.length === 0) {
+                    ordersTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No products found for selected filter</td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Sort products by rental start time (most recent first)
+                productsToShow.sort((a, b) => b.rentalStartTime - a.rentalStartTime);
+                
+                for (const product of productsToShow) {
+                    const row = document.createElement('tr');
+                    const status = getProductStatus(product);
+                    const isRented = product.renter.toLowerCase() === account.toLowerCase();
+                    
+                    row.innerHTML = `
+                        <td>#${product.pid}</td>
+                        <td>${product.name}${isRented ? ' (Rented)' : ''}</td>
+                        <td>${formatTimestamp(product.rentalStartTime)}</td>
+                        <td>${web3.utils.fromWei(product.priceInWei, 'ether')} ETH/hr</td>
+                        <td><span class="status-badge ${status.class}"><i class="${status.icon}"></i> ${status.text}</span></td>
+                        <td>
+                            <button class="btn btn-outline btn-sm details-btn" data-id="${product.pid}">View</button>
+                        </td>
+                    `;
+                    ordersTableBody.appendChild(row);
+                }
+                
+                // Setup details button listeners
+                document.querySelectorAll('.details-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = e.target.getAttribute('data-id');
+                        openDetailsModal(productId);
+                    });
+                });
+                
+            } catch (error) {
+                console.error("Error loading orders:", error);
+                showAlert("Failed to load orders", "error");
+            }
+        }
+
+        // Helper function to determine product status
+        function getProductStatus(product) {
+            if (!product.available && product.renter !== '0x0000000000000000000000000000000000000000') {
+                const currentTime = Math.floor(Date.now() / 1000);
+                const rentalEndTime = parseInt(product.rentalStartTime) + parseInt(product.rentalDuration);
+                
+                if (currentTime < rentalEndTime) {
+                    return {
+                        class: 'approved',
+                        icon: 'fas fa-clock',
+                        text: 'Active Rental'
+                    };
+                } else {
+                    return {
+                        class: 'returned',
+                        icon: 'fas fa-check',
+                        text: 'Completed'
+                    };
+                }
+            } else if (product.available) {
+                return {
+                    class: 'pending',
+                    icon: 'fas fa-circle',
+                    text: 'Available'
+                };
+            } else {
+                return {
+                    class: 'cancelled',
+                    icon: 'fas fa-times',
+                    text: 'Unavailable'
+                };
+            }
+        }
+
+        // Helper function to format timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp || timestamp === '0') {
+                return 'N/A';
+            }
+            return new Date(timestamp * 1000).toLocaleString();
+        }
+
+        // Add this JavaScript function to handle filtering
+        function setupOrderFilters() {
+            const filterOptions = document.querySelectorAll('#orders-page .filter-options .filter-option');
+            
+            filterOptions.forEach(option => {
+                option.addEventListener('click', async function() {
+                    // Update active state
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Get filter type
+                    const filterType = this.getAttribute('data-filter');
+                    
+                    // Reload orders with filter
+                    await loadOrders(filterType);
+                });
+            });
         }
     </script>
 </body>
