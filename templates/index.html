@@ -20,10 +20,12 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
+                <a href="/" style="text-decoration: none;">
                 <div class="logo">
                     <i class="fas fa-link" style="color: var(--primary);"></i>
                     <span>Medichain</span>
                 </div>
+                </a>
                 <button class="sidebar-toggle" id="sidebar-close">
                     <i class="fas fa-times"></i>
                 </button>
@@ -58,6 +60,12 @@
                         <a href="#" class="sidebar-menu-link" data-page="map-view">
                             <i class="fas fa-map-marked-alt"></i>
                             <span>Map View</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link" data-page="certifications">
+                            <i class="fas fa-certificate"></i>
+                            <span>Certifications</span>
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
@@ -152,10 +160,10 @@
                                         <i class="fas fa-box"></i>
                                     </div>
                                 </div>
-                                <div class="stat-value">24</div>
+                                <div class="stat-value">0</div>
                                 <div class="stat-change positive">
                                     <i class="fas fa-arrow-up"></i>
-                                    <span>12% from last month</span>
+                                    <span>0% from last month</span>
                                 </div>
                             </div>
                             <div class="stat-card">
@@ -165,10 +173,10 @@
                                         <i class="fas fa-handshake"></i>
                                     </div>
                                 </div>
-                                <div class="stat-value">8</div>
+                                <div class="stat-value">0</div>
                                 <div class="stat-change positive">
                                     <i class="fas fa-arrow-up"></i>
-                                    <span>5% from last month</span>
+                                    <span>0% from last month</span>
                                 </div>
                             </div>
                             <div class="stat-card">
@@ -178,10 +186,10 @@
                                         <i class="fas fa-clock"></i>
                                     </div>
                                 </div>
-                                <div class="stat-value">3</div>
+                                <div class="stat-value">0</div>
                                 <div class="stat-change negative">
                                     <i class="fas fa-arrow-down"></i>
-                                    <span>2% from last month</span>
+                                    <span>0% from last month</span>
                                 </div>
                             </div>
                             <div class="stat-card">
@@ -191,10 +199,10 @@
                                         <i class="fab fa-ethereum"></i>
                                     </div>
                                 </div>
-                                <div class="stat-value">5.24 ETH</div>
+                                <div class="stat-value">0.000 ETH</div>
                                 <div class="stat-change positive">
                                     <i class="fas fa-arrow-up"></i>
-                                    <span>18% from last month</span>
+                                    <span>0% from last month</span>
                                 </div>
                             </div>
                         </div>
@@ -306,12 +314,18 @@
                 <div class="page hidden" id="orders-page">
                     <div class="dashboard-header">
                         <h2 class="dashboard-title">Order Status</h2>
+                        <div class="header-actions">
                         <div class="filter-options">
                             <div class="filter-option active" data-filter="all">All</div>
                             <div class="filter-option" data-filter="owned">My Products</div>
                             <div class="filter-option" data-filter="rented">Rented by Me</div>
                             <div class="filter-option" data-filter="active">Active Rentals</div>
                             <div class="filter-option" data-filter="available">Available</div>
+                            </div>
+                            <button class="btn btn-primary return-product-btn" id="return-product-btn">
+                                <i class="fas fa-undo"></i>
+                                Return Product
+                            </button>
                         </div>
                     </div>
                     <table class="orders-table">
@@ -373,6 +387,28 @@
                             <i class="fas fa-location-crosshairs"></i>
                             Current Location
                         </button>
+                    </div>
+                </div>
+                <!-- Add this after the dashboard-page div -->
+                <div class="page hidden" id="certifications-page">
+                    <div class="dashboard-header">
+                        <h2 class="dashboard-title">Equipment Certifications</h2>
+                    </div>
+                    <div class="cert-controls">
+                        <div class="search-input-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" placeholder="Search certificates..." class="search-input" id="cert-search">
+                        </div>
+                        <select class="select-input" id="cert-type-filter">
+                            <option value="all">All Types</option>
+                            <option value="imaging">Imaging Equipment</option>
+                            <option value="monitoring">Monitoring Devices</option>
+                            <option value="surgical">Surgical Tools</option>
+                            <option value="diagnostic">Diagnostic Equipment</option>
+                        </select>
+                    </div>
+                    <div class="certificates-grid" id="certificates-container">
+                        <!-- Certificates will be loaded here dynamically -->
                     </div>
                 </div>
             </div>
@@ -496,6 +532,40 @@
         </div>
     </div>
 
+    <!-- Return Product Modal -->
+    <div class="modal-overlay" id="return-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Return Product</h3>
+                <button class="modal-close" id="return-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="return-product-id">Product ID</label>
+                    <input type="text" class="form-control" id="return-product-id" placeholder="Enter product ID">
+                    <div class="form-text">Please enter the ID of the product you want to return</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Return Location</label>
+                    <div class="location-coordinates">
+                        <input type="text" class="form-control" id="return-latitude" placeholder="Latitude" readonly>
+                        <input type="text" class="form-control" id="return-longitude" placeholder="Longitude" readonly>
+                    </div>
+                    <div class="form-text">Your current location will be used as the return location</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="return-modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="return-modal-confirm">
+                    <i class="fas fa-undo"></i>
+                    Confirm Return
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let web3;
         let contract;
@@ -537,6 +607,7 @@
             setupEventListeners();
             await checkWalletConnection();
             initMaps();
+            await loadDashboardStats();
             
             // Initialize chatbot
             window.addEventListener("DOMContentLoaded", function() {
@@ -610,6 +681,14 @@
             
             // Setup order filters
             setupOrderFilters();
+
+            // Add return product button listener
+            document.getElementById('return-product-btn').addEventListener('click', handleReturnProductClick);
+
+            // Return modal events
+            document.getElementById('return-modal-close').addEventListener('click', closeReturnModal);
+            document.getElementById('return-modal-cancel').addEventListener('click', closeReturnModal);
+            document.getElementById('return-modal-confirm').addEventListener('click', handleReturnConfirm);
         }
 
         // Page navigation
@@ -663,6 +742,10 @@
             // Load orders when visiting the orders page
             if (pageName === 'orders') {
                 loadOrders();
+            }
+            
+            if (pageName === 'dashboard') {
+                loadDashboardStats();
             }
         }
 
@@ -771,46 +854,46 @@
             allProductsContainer.innerHTML = "";
             
             try {
-                for (let i = 0; i < 10; i++) { // Load up to 10 products
+                for (let i = 0; i < 10; i++) {
                     const product = await getProduct(i);
                     if (product && product.name) {
                         // Create product card
                         const productCard = createProductCard(product);
+                        const productCardClone = productCard.cloneNode(true);
+                        
+                        // Add event listeners to the original card
+                        setupCardEventListeners(productCard, product);
+                        // Add event listeners to the cloned card
+                        setupCardEventListeners(productCardClone, product);
                         
                         // Add to dashboard featured products
-                        productContainer.appendChild(productCard.cloneNode(true));
+                        productContainer.appendChild(productCardClone);
                         
                         // Add to all products page
                         allProductsContainer.appendChild(productCard);
                     }
                 }
                 
-                // Add event listeners to rent buttons
-                document.querySelectorAll('.rent-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const productId = e.target.getAttribute('data-id');
-                        const productName = e.target.getAttribute('data-name');
-                        const productPrice = e.target.getAttribute('data-price');
-                        openRentModal(productId, productName, productPrice);
-                    });
-                });
-                
                 // Also load products on the map
                 await loadProductsOnMap();
+                await loadDashboardStats();
             } catch (error) {
                 console.error("Error loading products:", error);
+                showAlert("Failed to load products", "error");
             }
         }
 
+        // Update the createProductCard function to handle sub-rentable products
         function createProductCard(product) {
             const productCard = document.createElement("div");
             productCard.className = "product-card";
             
             const priceInEth = web3.utils.fromWei(product.priceInWei, 'ether');
+            const isSubRentable = !product.available && product.subRentAllowed;
             
             productCard.innerHTML = `
-                <div class="product-badge ${product.available ? 'available' : 'unavailable'}">
-                    ${product.available ? 'Available' : 'Unavailable'}
+                <div class="product-badge ${product.available ? 'available' : isSubRentable ? 'sub-rentable' : 'unavailable'}">
+                    ${product.available ? 'Available' : isSubRentable ? 'Available for Sub-rent' : 'Unavailable'}
                 </div>
                 <div class="product-image">
                     <i class="fas fa-heartbeat"></i>
@@ -826,15 +909,26 @@
                             <span class="product-info-label">Owner:</span>
                             <span class="product-info-value">${shortenAddress(product.owner)}</span>
                         </div>
+                        ${isSubRentable ? `
+                        <div class="product-info-item">
+                            <span class="product-info-label">Current Renter:</span>
+                            <span class="product-info-value">${shortenAddress(product.renter)}</span>
+                        </div>
+                        ` : ''}
                     </div>
                     <div class="product-price">
                         <i class="fab fa-ethereum"></i>
                         <span>${priceInEth}</span> ETH/hour
+                        ${isSubRentable ? '<span class="sub-rent-badge">Sub-rentable</span>' : ''}
                     </div>
                     <div class="product-actions">
-                        <button class="btn btn-primary rent-btn" data-id="${product.pid}" data-name="${product.name}" data-price="${priceInEth}" ${product.available ? '' : 'disabled'}>
+                        <button class="btn btn-primary rent-btn" 
+                            data-id="${product.pid}" 
+                            data-name="${product.name}" 
+                            data-price="${priceInEth}" 
+                            ${(!product.available && !isSubRentable) ? 'disabled' : ''}>
                             <i class="fas fa-shopping-cart"></i>
-                            Rent Now
+                            ${isSubRentable ? 'Sub-rent Now' : 'Rent Now'}
                         </button>
                         <button class="btn btn-outline details-btn" data-id="${product.pid}">
                             <i class="fas fa-info-circle"></i>
@@ -845,6 +939,73 @@
             `;
             
             return productCard;
+        }
+
+        // Add these styles to your existing style element
+        const subRentStyles = `
+            .sub-rentable {
+                background: rgba(124, 58, 237, 0.2) !important;
+                color: var(--primary) !important;
+                border: 1px solid var(--primary) !important;
+            }
+
+            .sub-rent-badge {
+                display: inline-block;
+                padding: 0.2rem 0.5rem;
+                background: rgba(124, 58, 237, 0.1);
+                color: var(--primary);
+                border-radius: 4px;
+                font-size: 0.75rem;
+                margin-left: 0.5rem;
+                border: 1px solid rgba(124, 58, 237, 0.2);
+            }
+
+            .product-card:hover .sub-rent-badge {
+                background: rgba(124, 58, 237, 0.2);
+            }
+
+            .product-info-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .product-info-label {
+                color: var(--text-secondary);
+                font-size: 0.875rem;
+            }
+
+            .product-info-value {
+                color: var(--text-primary);
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+        `;
+
+        document.head.appendChild(document.createElement('style')).textContent = subRentStyles;
+
+        // Add this new helper function to setup event listeners
+        function setupCardEventListeners(card, product) {
+            // Setup rent button
+            const rentBtn = card.querySelector('.rent-btn');
+            if (rentBtn) {
+                rentBtn.addEventListener('click', () => {
+                    const productId = rentBtn.getAttribute('data-id');
+                    const productName = rentBtn.getAttribute('data-name');
+                    const productPrice = rentBtn.getAttribute('data-price');
+                    openRentModal(productId, productName, productPrice);
+                });
+            }
+            
+            // Setup details button
+            const detailsBtn = card.querySelector('.details-btn');
+            if (detailsBtn) {
+                detailsBtn.addEventListener('click', () => {
+                    const productId = detailsBtn.getAttribute('data-id');
+                    openDetailsModal(productId);
+                });
+            }
         }
 
         // Rental modal functions
@@ -927,6 +1088,7 @@
             rentTotal.textContent = total;
         }
 
+        // Update the confirmRental function to handle sub-renting
         async function confirmRental() {
             const productId = rentProductId.value;
             const rentLongitude = Math.round(parseFloat(document.getElementById('rent-longitude').value) * 1000000);
@@ -943,12 +1105,51 @@
                 const totalRent = web3.utils.toWei((duration * web3.utils.fromWei(product.priceInWei, 'ether')).toString(), 'ether');
                 
                 const gasPrice = await web3.eth.getGasPrice();
-                const gasEstimate = await contract.methods.rentProduct(productId, duration * 3600, rentLatitude, rentLongitude).estimateGas({ from: account, value: totalRent });
+                let gasEstimate;
+                let transaction;
 
-                await contract.methods.rentProduct(productId, duration * 3600, rentLatitude, rentLongitude)
-                    .send({ from: account, value: totalRent, gasPrice: gasPrice, gas: gasEstimate });
+                // Check if this is a sub-rental
+                if (!product.available && product.subRentAllowed) {
+                    // Use subRentProduct function for sub-rentals
+                    gasEstimate = await contract.methods.subRentProduct(
+                        productId, 
+                        duration * 3600, 
+                        rentLatitude, 
+                        rentLongitude
+                    ).estimateGas({ from: account, value: totalRent });
+
+                    transaction = contract.methods.subRentProduct(
+                        productId, 
+                        duration * 3600, 
+                        rentLatitude, 
+                        rentLongitude
+                    );
+                } else {
+                    // Use regular rentProduct function for normal rentals
+                    gasEstimate = await contract.methods.rentProduct(
+                        productId, 
+                        duration * 3600, 
+                        rentLatitude, 
+                        rentLongitude
+                    ).estimateGas({ from: account, value: totalRent });
+
+                    transaction = contract.methods.rentProduct(
+                        productId, 
+                        duration * 3600, 
+                        rentLatitude, 
+                        rentLongitude
+                    );
+                }
+
+                // Execute the transaction
+                await transaction.send({ 
+                    from: account, 
+                    value: totalRent, 
+                    gasPrice: gasPrice, 
+                    gas: gasEstimate 
+                });
                 
-                showAlert("Product rented successfully!", "success");
+                showAlert(product.subRentAllowed ? "Product sub-rented successfully!" : "Product rented successfully!", "success");
                 closeRentModal();
                 await loadProducts();
                 await updateBalance();
@@ -1032,6 +1233,7 @@
         let productsMap = null;
         let productMarkers = [];
         let radiusCircle = null;
+        let detailsMap = null;
 
         // Initialize maps
         function initMaps() {
@@ -1365,6 +1567,12 @@
         function closeDetailsModal() {
             const modal = document.getElementById('details-modal');
             modal.classList.remove('active');
+            
+            // Clean up the map when closing the modal
+            if (detailsMap) {
+                detailsMap.remove();
+                detailsMap = null;
+            }
         }
 
         async function loadProductDetails(productId) {
@@ -1414,7 +1622,13 @@
                     const lng = parseInt(product.longitude) / 1000000;
                     
                     if (!isNaN(lat) && !isNaN(lng)) {
-                        const detailsMap = L.map('details-map').setView([lat, lng], 13);
+                        // Remove existing map if it exists
+                        if (detailsMap) {
+                            detailsMap.remove();
+                        }
+                        
+                        // Create new map
+                        detailsMap = L.map('details-map').setView([lat, lng], 13);
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: '© OpenStreetMap contributors'
                         }).addTo(detailsMap);
@@ -1430,6 +1644,11 @@
                             fillOpacity: 0.1,
                             weight: 2
                         }).addTo(detailsMap);
+
+                        // Force a map refresh
+                        setTimeout(() => {
+                            detailsMap.invalidateSize();
+                        }, 100);
                     }
                 }
             } catch (error) {
@@ -1450,51 +1669,6 @@
                     openDetailsModal(productId);
                 });
             });
-        }
-
-        // Update loadProducts function to setup details button listeners
-        async function loadProducts() {
-            const productContainer = document.getElementById("product-container");
-            const allProductsContainer = document.getElementById("all-products-container");
-            
-            if (!contract) return;
-            
-            productContainer.innerHTML = "";
-            allProductsContainer.innerHTML = "";
-            
-            try {
-                for (let i = 0; i < 10; i++) { // Load up to 10 products
-                    const product = await getProduct(i);
-                    if (product && product.name) {
-                        // Create product card
-                        const productCard = createProductCard(product);
-                        
-                        // Add to dashboard featured products
-                        productContainer.appendChild(productCard.cloneNode(true));
-                        
-                        // Add to all products page
-                        allProductsContainer.appendChild(productCard);
-                    }
-                }
-                
-                // Add event listeners to rent buttons
-                document.querySelectorAll('.rent-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const productId = e.target.getAttribute('data-id');
-                        const productName = e.target.getAttribute('data-name');
-                        const productPrice = e.target.getAttribute('data-price');
-                        openRentModal(productId, productName, productPrice);
-                    });
-                });
-                
-                // Setup details button listeners
-                setupProductCardEventListeners();
-                
-                // Also load products on the map
-                await loadProductsOnMap();
-            } catch (error) {
-                console.error("Error loading products:", error);
-            }
         }
 
         // Function to calculate distance between two points
@@ -1659,6 +1833,11 @@
                     const status = getProductStatus(product);
                     const isRented = product.renter.toLowerCase() === account.toLowerCase();
                     
+                    // Add return button for rented products that are active
+                    const isActiveRental = !product.available && 
+                        product.renter.toLowerCase() === account.toLowerCase() && 
+                        (parseInt(product.rentalStartTime) + parseInt(product.rentalDuration)) > Math.floor(Date.now() / 1000);
+                    
                     row.innerHTML = `
                         <td>#${product.pid}</td>
                         <td>${product.name}${isRented ? ' (Rented)' : ''}</td>
@@ -1666,19 +1845,21 @@
                         <td>${web3.utils.fromWei(product.priceInWei, 'ether')} ETH/hr</td>
                         <td><span class="status-badge ${status.class}"><i class="${status.icon}"></i> ${status.text}</span></td>
                         <td>
+                            <div class="action-buttons">
                             <button class="btn btn-outline btn-sm details-btn" data-id="${product.pid}">View</button>
+                                ${isActiveRental ? `
+                                    <button class="btn btn-primary btn-sm return-btn" data-id="${product.pid}">
+                                        <i class="fas fa-undo"></i> Return
+                                    </button>
+                                ` : ''}
+                            </div>
                         </td>
                     `;
                     ordersTableBody.appendChild(row);
                 }
                 
-                // Setup details button listeners
-                document.querySelectorAll('.details-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const productId = e.target.getAttribute('data-id');
-                        openDetailsModal(productId);
-                    });
-                });
+                // Setup button listeners
+                setupOrderButtonListeners();
                 
             } catch (error) {
                 console.error("Error loading orders:", error);
@@ -1745,6 +1926,623 @@
                     await loadOrders(filterType);
                 });
             });
+        }
+
+        async function loadDashboardStats() {
+            if (!contract || !account) return;
+            
+            try {
+                let totalProducts = 0;
+                let activeRentals = 0;
+                let pendingOrders = 0;
+                let totalRevenue = web3.utils.toBN('0');
+                const currentTime = Math.floor(Date.now() / 1000);
+
+                // Get all products
+                for (let i = 0; i < 10; i++) {
+                    try {
+                        const product = await getProduct(i);
+                        if (product && product.name) {
+                            // Count total products
+                            totalProducts++;
+                            
+                            // Check if product is rented and rental is active
+                            if (product.renter !== '0x0000000000000000000000000000000000000000') {
+                                const rentalEndTime = parseInt(product.rentalStartTime) + parseInt(product.rentalDuration);
+                                if (currentTime < rentalEndTime) {
+                                    activeRentals++;
+                                }
+                                
+                                // Calculate revenue
+                                const rentalPrice = web3.utils.toBN(product.priceInWei);
+                                const duration = web3.utils.toBN(product.rentalDuration).div(web3.utils.toBN('3600')); // Convert seconds to hours
+                                const productRevenue = rentalPrice.mul(duration);
+                                totalRevenue = totalRevenue.add(productRevenue);
+                            }
+                            
+                            // Count available products as pending orders
+                            if (product.available) {
+                                pendingOrders++;
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error fetching product ${i}:`, error);
+                        continue;
+                    }
+                }
+
+                // Convert total revenue from Wei to ETH and format to 4 decimal places
+                const revenueInEth = web3.utils.fromWei(totalRevenue, 'ether');
+                const formattedRevenue = parseFloat(revenueInEth).toFixed(4);
+
+                // Update dashboard stats
+                document.querySelector('.stats-grid .stat-card:nth-child(1) .stat-value').textContent = totalProducts;
+                document.querySelector('.stats-grid .stat-card:nth-child(2) .stat-value').textContent = activeRentals;
+                document.querySelector('.stats-grid .stat-card:nth-child(3) .stat-value').textContent = pendingOrders;
+                document.querySelector('.stats-grid .stat-card:nth-child(4) .stat-value').textContent = `${formattedRevenue} ETH`;
+
+                // Update change indicators
+                updateChangeIndicator(1, totalProducts > 0);
+                updateChangeIndicator(2, activeRentals > 0);
+                updateChangeIndicator(3, pendingOrders > 0);
+                updateChangeIndicator(4, !totalRevenue.isZero());
+
+            } catch (error) {
+                console.error("Error loading dashboard stats:", error);
+                showAlert("Failed to load dashboard statistics", "error");
+            }
+        }
+
+        // Add this helper function for updating change indicators
+        function updateChangeIndicator(cardIndex, isPositive) {
+            const card = document.querySelector(`.stats-grid .stat-card:nth-child(${cardIndex}) .stat-change`);
+            if (card) {
+                card.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
+                card.innerHTML = `
+                    <i class="fas fa-arrow-${isPositive ? 'up' : 'down'}"></i>
+                    <span>${isPositive ? 'Active' : 'Inactive'}</span>
+                `;
+            }
+        }
+
+        // Add this new function to handle return product
+        async function handleReturnProductClick() {
+            // Show the return modal
+            const returnModal = document.getElementById('return-modal');
+            returnModal.classList.add('active');
+
+                // Get current location
+            if (navigator.geolocation) {
+                try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    });
+                });
+
+                    document.getElementById('return-latitude').value = position.coords.latitude.toFixed(6);
+                    document.getElementById('return-longitude').value = position.coords.longitude.toFixed(6);
+            } catch (error) {
+                    console.error("Error getting location:", error);
+                    showAlert("Unable to get location. Please try again.", "error");
+                }
+            }
+        }
+
+        // Add this function to handle the return confirmation
+        async function handleReturnConfirm() {
+            try {
+                const productId = document.getElementById('return-product-id').value;
+                if (!productId) {
+                    showAlert("Please enter a product ID", "warning");
+                    return;
+                }
+
+                const latitude = Math.round(parseFloat(document.getElementById('return-latitude').value) * 1000000);
+                const longitude = Math.round(parseFloat(document.getElementById('return-longitude').value) * 1000000);
+
+                // Show loading state
+                const button = document.getElementById('return-modal-confirm');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                button.disabled = true;
+
+                // Estimate gas
+                const gasEstimate = await contract.methods.returnProduct(productId, latitude, longitude)
+                    .estimateGas({ from: account });
+
+                // Execute return
+                await contract.methods.returnProduct(productId, latitude, longitude)
+                    .send({ from: account, gas: gasEstimate });
+
+                showAlert("Product returned successfully!", "success");
+                closeReturnModal();
+                await loadOrders();
+                await loadDashboardStats();
+
+            } catch (error) {
+                console.error("Error returning product:", error);
+                showAlert("Failed to return product. Please try again.", "error");
+            } finally {
+                const button = document.getElementById('return-modal-confirm');
+                button.innerHTML = '<i class="fas fa-undo"></i> Confirm Return';
+                button.disabled = false;
+            }
+        }
+
+        // Add this function to close the return modal
+        function closeReturnModal() {
+            const modal = document.getElementById('return-modal');
+            modal.classList.remove('active');
+            document.getElementById('return-product-id').value = '';
+        }
+
+        // Add this function to setup button listeners
+        function setupOrderButtonListeners() {
+            // Setup details button listeners
+            document.querySelectorAll('.details-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const productId = e.target.getAttribute('data-id');
+                    openDetailsModal(productId);
+                });
+            });
+
+            // Setup return button listeners
+            document.querySelectorAll('.return-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const productId = e.target.getAttribute('data-id');
+                    if (confirm('Are you sure you want to return this product?')) {
+                        await handleReturnProduct(productId);
+                    }
+                });
+            });
+        }
+
+        // Add some CSS for the action buttons
+        const style = document.createElement('style');
+        style.textContent = `
+            .action-buttons {
+                display: flex;
+                gap: 0.5rem;
+                justify-content: flex-end;
+            }
+            
+            .return-btn {
+                background-color: var(--primary);
+                color: white;
+            }
+            
+            .return-btn:hover {
+                background-color: var(--primary-dark);
+            }
+
+            .dashboard-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 2rem;
+            }
+
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .return-product-btn {
+                padding: 0.5rem 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background-color: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .return-product-btn:hover {
+                background-color: var(--primary-dark);
+            }
+
+            .return-product-btn i {
+                font-size: 1rem;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add these styles to your existing style element
+        const certificationStyles = `
+            .certificates-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 1.5rem;
+                padding: 1.5rem 0;
+                perspective: 1000px;
+            }
+
+            .certificate-card {
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                overflow: hidden;
+                transition: all 0.3s ease;
+                transform-style: preserve-3d;
+                position: relative;
+            }
+
+            .certificate-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0 20px rgba(124, 58, 237, 0.2),
+                            0 0 40px rgba(124, 58, 237, 0.1);
+                border-color: var(--primary);
+            }
+
+            .certificate-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: var(--radius);
+                border: 2px solid transparent;
+                transition: all 0.3s ease;
+                pointer-events: none;
+            }
+
+            .certificate-card:hover::before {
+                border-color: var(--primary);
+                box-shadow: 0 0 15px var(--primary);
+            }
+
+            .certificate-image-container {
+                position: relative;
+                height: 180px;
+                background: rgba(255, 255, 255, 0.05);
+                overflow: hidden;
+            }
+
+            .certificate-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+
+            .certificate-card:hover .certificate-image {
+                transform: scale(1.05);
+            }
+
+            .certificate-badge {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                padding: 0.4rem 0.8rem;
+                border-radius: 9999px;
+                background: rgba(124, 58, 237, 0.2);
+                color: var(--primary);
+                font-size: 0.75rem;
+                font-weight: 600;
+                backdrop-filter: blur(4px);
+                border: 1px solid rgba(124, 58, 237, 0.3);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .certificate-content {
+                padding: 1.5rem;
+            }
+
+            .certificate-content h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                color: var(--text-primary);
+            }
+
+            .manufacturer {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                margin-bottom: 1rem;
+            }
+
+            .type-badge {
+                display: inline-block;
+                padding: 0.3rem 0.8rem;
+                border-radius: var(--radius);
+                background: rgba(124, 58, 237, 0.1);
+                color: var(--primary);
+                font-size: 0.75rem;
+                font-weight: 500;
+                border: 1px solid rgba(124, 58, 237, 0.2);
+            }
+
+            .certificate-expiry {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+            }
+
+            .certificate-footer {
+                display: flex;
+                justify-content: space-between;
+                padding: 1.25rem;
+                border-top: 1px solid var(--border);
+                background: rgba(0, 0, 0, 0.2);
+            }
+
+            .certificate-button {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                border-radius: var(--radius);
+                background: transparent;
+                border: 1px solid var(--border);
+                color: var(--text-primary);
+                font-size: 0.875rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .certificate-button:hover {
+                background: var(--primary);
+                border-color: var(--primary);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+            }
+
+            /* Search and Filter Styles */
+            .cert-controls {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .search-input-container {
+                position: relative;
+                flex: 1;
+                max-width: 400px;
+            }
+
+            .search-input {
+                width: 100%;
+                padding: 0.75rem 1rem 0.75rem 2.5rem;
+                border-radius: var(--radius);
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--border);
+                color: var(--text-primary);
+                font-size: 0.875rem;
+                transition: all 0.3s ease;
+            }
+
+            .search-input:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+                outline: none;
+            }
+
+            .search-icon {
+                position: absolute;
+                left: 0.75rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-secondary);
+            }
+
+            .select-input {
+                padding: 0.75rem 2.5rem 0.75rem 1rem;
+                border-radius: var(--radius);
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--border);
+                color: var(--text-primary);
+                font-size: 0.875rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                appearance: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.5rem center;
+                background-size: 1rem;
+            }
+
+            .select-input:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+                outline: none;
+            }
+        `;
+
+        document.head.appendChild(document.createElement('style')).textContent = certificationStyles;
+
+        // Add these functions to your existing JavaScript
+        async function loadCertifications() {
+            const container = document.getElementById('certificates-container');
+            const searchTerm = document.getElementById('cert-search').value.toLowerCase();
+            const typeFilter = document.getElementById('cert-type-filter').value;
+            
+            try {
+                // In a real implementation, you would fetch this data from your smart contract
+                const certificates = await getCertificatesData();
+                
+                // Filter certificates based on search and type
+                const filteredCerts = certificates.filter(cert => {
+                    const matchesSearch = cert.name.toLowerCase().includes(searchTerm) ||
+                                        cert.manufacturer.toLowerCase().includes(searchTerm);
+                    const matchesType = typeFilter === 'all' || cert.type.toLowerCase() === typeFilter.toLowerCase();
+                    return matchesSearch && matchesType;
+                });
+                
+                // Clear container and add filtered certificates
+                    container.innerHTML = '';
+                    filteredCerts.forEach(cert => {
+                        container.appendChild(createCertificateCard(cert));
+                    });
+            } catch (error) {
+                console.error('Error loading certificates:', error);
+                showAlert('Failed to load certificates', 'error');
+            }
+        }
+
+        // Add this to your JavaScript
+        const MOCK_CERTIFICATES = [
+            {
+                id: '1',
+                name: 'MRI Scanner Model X500',
+                manufacturer: 'MedTech Imaging',
+                type: 'Imaging Equipment',
+                status: 'Valid',
+                expiryDate: '05/14/2025',
+                image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=500'
+            },
+            {
+                id: '2',
+                name: 'Patient Monitor PM-8000',
+                manufacturer: 'HealthCare Systems',
+                type: 'Monitoring Devices',
+                status: 'Valid',
+                expiryDate: '06/21/2025',
+                image: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=500'
+            },
+            {
+                id: '3',
+                name: 'Surgical Robot SR-X',
+                manufacturer: 'Precision Surgical',
+                type: 'Surgical Tools',
+                status: 'Valid',
+                expiryDate: '04/09/2025',
+                image: 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=500'
+            },
+            {
+                id: '4',
+                name: 'Digital X-Ray System DX-100',
+                manufacturer: 'RadiTech',
+                type: 'Imaging Equipment',
+                status: 'Valid',
+                expiryDate: '07/04/2025',
+                image: 'https://images.unsplash.com/photo-1584362917165-526a968579e8?w=500'
+            },
+            {
+                id: '5',
+                name: 'Ultrasound Scanner US-Pro',
+                manufacturer: 'SonoMed',
+                type: 'Diagnostic Equipment',
+                status: 'Valid',
+                expiryDate: '11/17/2024',
+                image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=500'
+            },
+            {
+                id: '6',
+                name: 'ECG Machine ECG-12L',
+                manufacturer: 'CardioTech',
+                type: 'Diagnostic Equipment',
+                status: 'Valid',
+                expiryDate: '09/29/2024',
+                image: 'https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=500'
+            }
+        ];
+
+        // Update the getCertificatesData function
+        async function getCertificatesData() {
+            return MOCK_CERTIFICATES;
+        }
+
+        // Add tilt effect to certificates
+        function addTiltEffect(card) {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+            });
+        }
+
+        // Update the createCertificateCard function
+        function createCertificateCard(cert) {
+            const card = document.createElement('div');
+            card.className = 'certificate-card';
+            card.innerHTML = `
+                <div class="certificate-image-container">
+                    <img src="${cert.image}" alt="${cert.name}" class="certificate-image">
+                    <div class="certificate-badge">${cert.status}</div>
+                </div>
+                <div class="certificate-content">
+                    <h3>${cert.name}</h3>
+                    <p class="manufacturer">
+                        <i class="fas fa-building"></i> ${cert.manufacturer}
+                    </p>
+                    <div class="certificate-type">
+                        <span class="type-badge">
+                            <i class="fas fa-tag"></i> ${cert.type}
+                        </span>
+                    </div>
+                    <div class="certificate-expiry">
+                        <i class="fas fa-clock"></i>
+                        <span>Expires: ${cert.expiryDate}</span>
+                    </div>
+                </div>
+                <div class="certificate-footer">
+                    <button class="certificate-button" onclick="viewCertificate('${cert.id}')">
+                        <i class="fas fa-eye"></i>
+                        View
+                    </button>
+                    <button class="certificate-button" onclick="downloadCertificate('${cert.id}')">
+                        <i class="fas fa-download"></i>
+                        Download
+                    </button>
+                </div>
+            `;
+            
+            addTiltEffect(card);
+            return card;
+        }
+
+        // Add event listeners for search and filter
+        document.getElementById('cert-search').addEventListener('input', debounce(loadCertifications, 300));
+        document.getElementById('cert-type-filter').addEventListener('change', loadCertifications);
+
+        // Helper function for debouncing
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Placeholder functions for view and download
+        function viewCertificate(id) {
+            // Implement certificate viewing logic
+            showAlert('Viewing certificate ' + id, 'info');
+        }
+
+        function downloadCertificate(id) {
+            // Implement certificate download logic
+            showAlert('Downloading certificate ' + id, 'info');
         }
     </script>
 </body>
